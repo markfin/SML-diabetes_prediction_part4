@@ -1,0 +1,44 @@
+
+name: Preprocess Diabetes Data
+
+on:
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+  push:
+    branches:
+      - main # Adjust if your main branch is named differently (e.g., master)
+    paths:
+      - 'diabetes.csv'
+      - 'automate_SML_diabetes_prediction_part4.py'
+      - 'preprocess_runner.py'
+
+jobs:
+  preprocess-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy scikit-learn
+
+      - name: Run preprocessing script
+        # The runner script is expected to be in the root of the repository after checkout
+        run: python preprocess_runner.py
+
+      - name: Commit and push processed data
+        run: |
+          git config user.name "markfin"
+          git config user.email "marfinzamaruddin@gmail.com"
+          # Add the processed file. 'git add .' could also be used but explicit is better here.
+          git add processed_diabetes.csv
+          # Only commit if there are changes (avoids errors if no new data was generated)
+          git commit -m "Automated: Updated processed diabetes data" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Uses the default GITHUB_TOKEN for pushing

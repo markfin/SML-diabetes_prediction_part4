@@ -1,0 +1,43 @@
+
+name: CI Model Training
+
+on:
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+  push:
+    branches:
+      - main
+    paths:
+      - 'Workflow-CI/MLProject/train_model.py'
+      - 'Workflow-CI/MLProject/conda.yaml'
+      - 'SML-diabetes_prediction_part4/processed_diabetes.csv'
+
+jobs:
+  build-and-train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9' # Use the same Python version as in conda.yaml
+
+      - name: Install dependencies (Conda)
+        # Conda is usually pre-installed on ubuntu-latest runners. If not, add setup-miniconda action.
+        run: |
+          conda env create -f Workflow-CI/MLProject/conda.yaml
+          conda activate mlflow-diabetes-env
+
+      - name: Run MLflow training script
+        # Navigate to the MLProject directory and run the script
+        run: |
+          conda activate mlflow-diabetes-env
+          python Workflow-CI/MLProject/train_model.py
+
+      - name: Upload MLflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlflow-artifacts
+          path: mlruns/
+

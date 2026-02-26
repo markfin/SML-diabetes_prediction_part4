@@ -1,0 +1,12 @@
+
+name: mlflow-diabetes-env
+channels:
+  - defaults
+dependencies:
+  - python=3.9
+  - pandas
+  - numpy
+  - scikit-learn
+  - mlflow
+  - pip:
+    - "mlflow==2.11.3"
