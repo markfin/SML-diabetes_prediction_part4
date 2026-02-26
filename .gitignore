@@ -1,0 +1,7 @@
+
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+requirements.txt
+processed_diabetes.csv # Assuming this is generated and shouldn't be manually committed
